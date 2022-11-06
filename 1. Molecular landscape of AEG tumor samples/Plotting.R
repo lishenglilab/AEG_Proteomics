@@ -1,4 +1,4 @@
-### waterfall plot of top mutation cancer genes
+### waterfall plot of top mutation cancer genes, Fig. 1b
 library(maftools)
 setwd('/home/shengli/projects/AEG_proteomics/data/WES')
 aeg <- read.maf(maf='AEG_mutation_cancer_gene.maf')
