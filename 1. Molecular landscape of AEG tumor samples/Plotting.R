@@ -1,5 +1,5 @@
 ### waterfall plot of top mutation cancer genes, Fig. 1b
-library(maftools)
+library(maftools) # version 2.6.05
 setwd('/home/shengli/projects/AEG_proteomics/data/WES')
 aeg <- read.maf(maf='AEG_mutation_cancer_gene.maf')
 pdf('/home/shengli/projects/AEG_proteomics/figures/WES/mutation_waterfall_cancer_genes_top30.pdf',height=6,width=10)
@@ -23,7 +23,7 @@ wilcox.test(as.numeric(num_normal_ordered[,'Protein_number']),as.numeric(num_tum
 pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/Protein_numbers_normal.pdf',height=5,width=5)
 plot(num_normal_ordered[,'Protein_number'],ylim=c(8000,9500),las=1)
 dev.off()
-library(ggplot2)
+library(ggplot2) # version 3.3.5
 nums <- c(as.numeric(num_tumor_ordered[,'Protein_number']),as.numeric(num_normal_ordered[,'Protein_number']))
 nums_df <- data.frame(Numbers=nums,
                       sample_group=c(rep('tumor',103),rep('normal',103)))
@@ -63,7 +63,7 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/Phosphoproteomics/Protein_num
 plot(num_normal_ordered[,'Protein_number'],ylim=c(8000,9500),las=1)
 dev.off()
 
-library(ggplot2)
+library(ggplot2) # version 3.3.5
 nums <- c(as.numeric(num_tumor_ordered[,'Phosphoproteomics_number']),as.numeric(num_normal_ordered[,'Phosphoproteomics_number']))
 nums_df <- data.frame(Numbers=nums,
                       sample_group=c(rep('tumor',103),rep('normal',103)))
@@ -103,7 +103,7 @@ dev.off()
 
 
 ### Boxplot showing the comparison of the numbers of expressed genes between parired AEG tumor and NAT samples, Supplementary Fig. 4c
-library(ggplot2)
+library(ggplot2) # version 3.3.5
 nums <- c(as.numeric(num_tumor_ordered[,'Gene_number']),as.numeric(num_normal_ordered[,'Gene_number']))
 nums_df <- data.frame(Numbers=nums,
                       sample_group=c(rep('tumor',85),rep('normal',85)))
