@@ -1,6 +1,5 @@
 ### Volcano plot showing the difference in proteins between AEG tumor and paired NAT samples. Fig. 2a
 
-
 ## valcono plot of differentially expressed proteins
 rm(list=ls())
 library(ggplot2)
@@ -178,5 +177,37 @@ ggplot(scores,aes(x=Group,y=Score)) +
         strip.text.y = element_text(angle = 0,hjust=0,color="black",size=8),
         strip.background = element_blank(),
         strip.text.x = element_text(color="black",size=7,vjust=0))
+dev.off()
+
+## plot survival curves for individual hallmark scores
+library(survival)
+library(ggplot2)
+library(survminer)
+setwd('/home/shengli/projects/AEG_proteomics/data/clinical')
+surv_data <- read.table('survival_data_v3.txt',header=T,sep='\t')
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+hk_scoress <- read.table('AEG_protein_hallmark_scores.txt',header=T,row.names=1,sep='\t')
+hk_sc_tumor <- hk_scoress['HALLMARK_KRAS_SIGNALING_UP',1:103]
+mid_sc <- median(as.numeric(hk_sc_tumor))
+pt_high <- colnames(hk_sc_tumor)[which(hk_sc_tumor[1,] > mid_sc)]
+pt_low <- colnames(hk_sc_tumor)[which(hk_sc_tumor[1,] <= mid_sc)]
+surv_data[which(surv_data[,'Patient'] %in% pt_high),'Group'] <- 'High'
+surv_data[which(surv_data[,'Patient'] %in% pt_low),'Group'] <- 'Low'
+fit <- survfit(Surv(Time,Status)~Group, data=surv_data)
+ 
+pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/hk_kras_signaling_up_survival.pdf',width=5.33,height=4.82)
+ggsurvplot(
+  fit,                     # survfit object with calculated statistics.
+  data = surv_data,             # data used to fit survival curves.
+  risk.table = TRUE,       # show risk table.
+  pval = TRUE,             # show p-value of log-rank test.
+  conf.int = FALSE,         # show confidence intervals for 
+  xlim = c(0,100),         # present narrower X axis, but not affect
+  xlab = "Time in months",   # customize X axis label.
+  break.time.by = 20,     # break X axis in time intervals by 500.
+  ggtheme = theme_light(), # customize plot and risk table with a theme.
+  risk.table.y.text.col = T, # colour risk table text annotations.
+  risk.table.y.text = FALSE # show bars instead of names in text annotations
+)
 dev.off()
 
