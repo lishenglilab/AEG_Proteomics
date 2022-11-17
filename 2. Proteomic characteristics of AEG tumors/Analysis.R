@@ -108,3 +108,62 @@ rownames(results) <- rownames(hk_scores)
 setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
 write.table(results,file='AEG_hallmark_diff.txt',sep='\t',quote=F,col.names=F)
 
+### survival analysis for DEP
+
+rm(list=ls())
+library(survival)
+aeg_clinical <- read.table('/home/shengli/projects/AEG_proteomics/data/clinical/survival_data_v3.txt',header=T,sep='\t')
+dep_prot <- read.table('/home/shengli/projects/AEG_proteomics/results/proteome/Normal_Tumor_DEP_sig_genes.txt',header=T,sep='\t')
+dep_prots <- dep_prot[,'Protein']
+prot_profile <- read.table('/home/shengli/projects/AEG_proteomics/results/proteome/Proteomics_iBAQ103_log2quantile_normlization_impute_perc25.txt',header=T,row.names=1,sep='\t')
+prot_profile <- prot_profile[,1:103]
+rownames(aeg_clinical) <- aeg_clinical[,'Patient']
+dep_profile <- prot_profile[dep_prots,]
+aeg_clinical <- aeg_clinical[colnames(dep_profile),]
+Results <- matrix(NA,nrow(dep_profile),11,byrow=TRUE)
+rownames(Results) <- rownames(dep_profile)
+colnames(Results) <- c('coef','Exp(coef)','Coxp','KMp','N','low','high','log2expr_FC','CI_95%_for_HR','Time_dif','log2Time_FC')
+
+for (r in 1:nrow(Results)) {
+  prot_exp <- as.numeric(dep_profile[r,])
+  time_month <- aeg_clinical[,'Time']
+  cen_status <- aeg_clinical[,'Status']
+  Results[r,'N'] <- length(prot_exp)
+  test_data1 <- list(time = time_month,
+                     status = cen_status,
+                     prot_expr = prot_exp)
+  tempresult <- try(model0 <- coxph(Surv(time,status) ~ prot_expr, data=test_data1, na.action=na.exclude),silent=TRUE)
+  if (!is(tempresult,'try-error')) {
+    Results[r,c('coef','Exp(coef)','Coxp')] <- signif(as.numeric(summary(model0)$coefficients[1,c('coef','exp(coef)','Pr(>|z|)')]),digit=3)
+    HR_detail = summary(model0)
+    Results[r,c('CI_95%_for_HR')] = paste(signif(HR_detail$conf.int[,'lower .95'],4),'-',signif(HR_detail$conf.int[,'upper .95'],4),sep=' ')
+    cutgroup <- ifelse(prot_exp <= median(prot_exp),'Low','High')
+    if (length(unique(cutgroup)) > 1) {
+      test_data2 <- list(time = time_month,
+                         status = cen_status,
+                         group = as.factor(cutgroup))
+      model1 <- survdiff(Surv(time,status) ~ group, data=test_data2,na.action=na.exclude)
+      Results[r,'KMp'] <- 1 - pchisq(model1$chisq,df=length(levels(factor(cutgroup))) - 1)
+      Results[r,'low'] <- median(prot_exp[cutgroup == 'Low'])
+      Results[r,'high'] <- median(prot_exp[cutgroup == 'High'])
+      Results[r,'log2expr_FC'] <- log2((median(prot_exp[cutgroup == 'High'])+1)/(median(prot_exp[cutgroup == 'Low']) + 1))
+      Results[r,'Time_dif'] <- mean(time_month[cutgroup == 'High']) - mean(time_month[cutgroup == 'Low'])
+      Results[r,'log2Time_FC'] <- log2((median(time_month[cutgroup == 'High'])+1)/(median(time_month[cutgroup == 'Low']) + 1))
+    }
+  } else {
+    cat("Coxph test doesn't pass!\n")
+  }
+}
+
+tmp <- as.numeric(as.vector(Results[,'Coxp']))
+CoxFDRAdjustPvalue <- p.adjust(tmp,method='fdr')
+CoxOtherAdjustPvalue <- p.adjust(tmp,method='bonferroni')
+tmp <- as.numeric(as.vector(Results[,'KMp']))
+KMpFDRAdjustPvalue <- p.adjust(tmp,method='fdr')
+KMpOtherAdjustPvalue <- p.adjust(tmp,method='bonferroni')
+Results <- cbind(Marker=rownames(Results),Results,FDR=CoxFDRAdjustPvalue,Bonferroni=CoxOtherAdjustPvalue,
+                KMFDR=KMpFDRAdjustPvalue, KMBonferroni=KMpOtherAdjustPvalue)
+
+write.table(Results,file='/home/shengli/projects/AEG_proteomics/results/proteome/survival_analysis/DEP_survival.txt',sep='\t',quote=FALSE,row.names=FALSE)
+
+
