@@ -197,3 +197,24 @@ aeg_s3 <- read.maf(maf='AEG_mutation_neat_filter_non151058_group3.maf')
 pdf('/home/shengli/projects/AEG_proteomics/figures/WES/mutation_waterfall_S3_top30.pdf',height=6,width=10)
 oncoplot(maf=aeg_s3,draw_titv=T,top=30)
 dev.off()
+
+# pie chart of mutation-protein affects, Supplementary Fig.9a
+s1_effects <- c(24453,40731)
+names(s1_effects) <- c('up','down')
+pdf('/home/shengli/projects/AEG_proteomics/figures/2022.08/AEG_mut_prot_effect_stat_s1.pdf',height = 5, width =5)
+pie(s1_effects)
+dev.off()
+
+s2_effects <- c(1328,2572)
+names(s2_effects) <- c('up','down')
+pdf('/home/shengli/projects/AEG_proteomics/figures/2022.08/AEG_mut_prot_effect_stat_s2.pdf',height=5,width=5)
+pie(s2_effects)
+dev.off()
+
+
+s3_effects <- c(432,714)
+names(s3_effects) <- c('up','down')
+pdf('/home/shengli/projects/AEG_proteomics/figures/2022.08/AEG_mut_prot_effect_stat_s3.pdf',height = 5, width = 5)
+pie(s3_effects)
+dev.off()
+
