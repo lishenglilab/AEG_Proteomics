@@ -82,7 +82,7 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/WES/WIZ_subtype_mutation_freq
 barplot(mut_rate,las=2,ylim=c(0,0.15))
 dev.off()
 
-#plot all difference of gene-level hallmarks
+#plot all difference of gene-level hallmarks, Fig. 3d
 setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq')
 hk_dif <- read.table('AEG_hallmarks_diff.txt',header=T,sep='\t')
 hallmarks <- c('Apical junction','Apical surface','Peroxisome',
@@ -112,4 +112,32 @@ ggplot(hk_dif,aes(x=Hallmark,y=Subtype))+
         legend.title=element_text(size=12),
         legend.key=element_rect(fill="white",colour="black"))
 dev.off()
+
+# plot single hallmarks, Fig. 3e-f
+setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq')
+hallmark_scores <- read.table('AEG_hallmark_scores.txt',header=T,row.names=1,sep='\t')
+scores_s1 <- as.numeric(hallmark_scores['HALLMARK_PANCREAS_BETA_CELLS',samples_t1_p])
+scores_s2 <- as.numeric(hallmark_scores['HALLMARK_PANCREAS_BETA_CELLS',samples_t2_p])
+scores_s3 <- as.numeric(hallmark_scores['HALLMARK_PANCREAS_BETA_CELLS',samples_t3_p])
+
+scores <- data.frame(Score=c(scores_s1,scores_s2,scores_s3),
+                     Sample=c(samples_t1_p,samples_t2_p,samples_t3_p),
+                     Group=c(rep('S1',38),rep('S2',16),rep('S3',30)))
+pdf('/home/shengli/projects/AEG_proteomics/figures/RNAseq/hk_pancreas_beta_cells_comp.pdf',width=5,height = 4)
+ggplot(scores,aes(x=Group,y=Score)) +
+  geom_jitter(width=0.15,size=1.5) +
+  geom_boxplot(color="black",fill=NA,outlier.shape=NA,width=0.3) +
+  scale_x_discrete(limit=c("S1","S2","S3"),expand=c(0.1,0)) +
+  theme(axis.text=element_text(size=10,colour="black"),axis.title=element_blank(),
+        panel.background = element_rect(fill = NA,color="black"),
+        panel.grid = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x=element_text(size=7,colour="black",angle=90,vjust=0.5,hjust=1),
+        axis.text.y=element_text(size=7,colour="black"),
+        strip.text.y = element_text(angle = 0,hjust=0,color="black",size=8),
+        strip.background = element_blank(),
+        strip.text.x = element_text(color="black",size=7,vjust=0))
+dev.off()
+
+
 
