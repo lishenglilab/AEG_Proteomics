@@ -67,7 +67,7 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/Prot_hk_scores_hea
 pheatmap(hk_scores,scale='row',show_rownames=T,show_colnames=F,cluster_col=F,cluster_row=T,fontsize_col=5,fontsize_row=6,border_color=NA,color=colorRampPalette(c('blue','white','red'))(100))
 dev.off()
 
-# barplot for individual hallmarks
+# boxplot for individual hallmarks, Fig. 2d
 setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
 hk_scores <- read.table('AEG_protein_hallmark_scores.txt',header=T,row.names=1,sep='\t')
 hk <- 'HALLMARK_APICAL_JUNCTION'
@@ -92,7 +92,7 @@ ggplot(scores,aes(x=Group,y=Score)) +
         strip.text.x = element_text(color="black",size=7,vjust=0))
 dev.off()
 
-## plot survival curves for individual hallmark scores
+## plot survival curves for individual hallmark scores, 
 library(survival)
 library(ggplot2)
 library(survminer)
