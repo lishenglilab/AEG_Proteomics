@@ -172,4 +172,21 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/clinical_multicox.
 ggforest(model_cox)
 dev.off()
 
+### heatmap for signature proteins
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+sig_prf <- read.table('Proteomics_signature_proteins.txt',header=T,row.names=1,sep='\t')
+res <- read.table('signature_proteins_cox.txt',header=T,row.names=1,sep='\t')
+sigp_cox <- res[which(res[,'p.value'] < 0.05),]
+
+prt_order <- c('P35670','Q96GY3','Q92994','P02775','Q96AT1','Q9H4M3','P24592','Q6H8Q1','Q13563','Q6FHJ7','P29279','P04234')
+pdf('/home/shengli/projects/AEG_proteomics/figures/sigp_coxsig_heatmap.pdf',height=3.5,width=7)
+pheatmap(sig_prf[prt_order,],scale='row',show_rownames=T,show_colnames=T,cluster_col=F,cluster_row=F,fontsize_col=5,fontsize_row=5,color=colorRampPalette(c('blue','white','red'))(100))
+dev.off()
+### cox forest plot
+headers <- c('Patient','Status','Time',prt_order)
+data_sigp <- data_mx[,headers]
+model_cox <- coxph(Surv(Time,Status) ~ P35670 + Q96GY3 + Q92994 + P02775 + Q96AT1 + Q9H4M3 + P24592 + Q6H8Q1 + Q13563 + Q6FHJ7 + P29279 + P04234, data = data_sigp)
+pdf('/home/shengli/projects/AEG_proteomics/figures/sigp_multicox.pdf',height=3.5,width=6.5)
+ggforest(model_cox)
+dev.off()
 
