@@ -2,11 +2,11 @@
 
 library(maftools)
 library(ggplot2)
-setwd('/home/shengli/projects/0.Collaborations/4.Qin.Jiangjiang/data/WES')
+setwd('/home/shengli/projects/AEG_proteomics/data/WES')
 aeg <- read.maf(maf='AEG_mutation_neat_filter_non151058_cancer_gene.maf')
 
 aeg_tmb <- tmb(aeg,captureSize = 1,logScale = F)
-setwd('/home/shengli/projects/0.Collaborations/4.Qin.Jiangjiang/results/WES')
+setwd('/home/shengli/projects/AEG_proteomics/results/WES')
 write.table(aeg_tmb, file='AEG_TMB.txt',quote=F,sep='\t',row.names=F)
 
 tumor_tmb <- read.table('AEG_TMB.txt',header=T,row.names=1,sep='\t')
