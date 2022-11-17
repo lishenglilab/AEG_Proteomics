@@ -123,7 +123,21 @@ ggsurvplot(
   risk.table.y.text = FALSE # show bars instead of names in text annotations
 )
 dev.off()
-# heatmap for differential druggable genes, Fig. 2f
+
+### heatmap for top DEPs in PPI network, Fig. 2f
+prots <- c('P42771','P10145','P62308','P11215','P38919','P17844','Q92841','P07910','P12004','P09651','P46531','P05067','P08238',
+           'P42224','P20226','Q07817','O14980','P49915','P35354','P63165','P04637','P07900','P02751','Q13547','P01730','Q09472',
+           'O43143','P06493','P22087','P40763','P14635','Q07955','Q15029','P11388','Q15910','Q96EB6','Q9BZE4','P23921','Q9Y265',
+           'P24941','P19338','P14780','P04626')
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+prot_mx <- read.table('Proteomics_iBAQ103_log2quantile_normlization_impute_perc25.txt',header=T,row.names=1,sep='\t')
+prot_mx <- prot_mx[prots,]
+prot_mx <- as.matrix(prot_mx)
+pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/DEP_PPI_heatmap.pdf',width=5,height=8)
+pheatmap(prot_mx,scale='row',show_rownames=T,show_colnames=F,cluster_col=F,cluster_row=T,fontsize_col=5,fontsize_row=10,border_color=NA,color=colorRampPalette(c('blue','white','red'))(100))
+dev.off()
+
+### heatmap for differential druggable genes, Supplementary Fig. 5a
 setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
 dep_drg <- read.table('DEP_sig_druggable_genes.txt',header=T)
 dep_drg2 <- dep_drg[which(abs(dep_drg[,'logFC']) > 1),]
@@ -138,5 +152,30 @@ dep_sig_mx <- as.matrix(dep_sig_mx)
 pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/DEP_druggable_heatmap_v2.pdf',width=5,height=8)
 pheatmap(dep_sig_mx,scale='row',show_rownames=T,show_colnames=F,cluster_col=F,cluster_row=T,fontsize_col=5,fontsize_row=6,border_color=NA,color=colorRampPalette(c('blue','white','red'))(100))
 dev.off()
+### boxplot for individual proteins, Supplementary Fig. 5b
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+prot_mx <- read.table('Proteomics_iBAQ103_log2quantile_normlization_impute_perc25.txt',header=T,row.names=1,sep='\t')
+prot <- 'P35869'
+expr_normal <- as.numeric(prot_mx[prot,104:206])
+expr_tumor <- as.numeric(prot_mx[prot,1:103])
+expr <- data.frame(Expr=c(expr_normal,expr_tumor),
+                     Sample=c(colnames(prot_mx)[104:206],colnames(prot_mx)[1:103]),
+                     Group=c(rep('Normal',103),rep('Tumor',103)))
+pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/Proteomics_P35869_nt.pdf',width=5,height = 4)
+ggplot(expr,aes(x=Group,y=Expr)) +
+  geom_jitter(width=0.15,size=1.5) +
+  geom_boxplot(color="black",fill=NA,outlier.shape=NA,width=0.3) +
+  scale_x_discrete(limit=c("Normal","Tumor"),expand=c(0.1,0)) +
+  theme(axis.text=element_text(size=10,colour="black"),axis.title=element_blank(),
+        panel.background = element_rect(fill = NA,color="black"),
+        panel.grid = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x=element_text(size=7,colour="black",angle=90,vjust=0.5,hjust=1),
+        axis.text.y=element_text(size=7,colour="black"),
+        strip.text.y = element_text(angle = 0,hjust=0,color="black",size=8),
+        strip.background = element_blank(),
+        strip.text.x = element_text(color="black",size=7,vjust=0))
+dev.off()
+
 
 
