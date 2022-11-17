@@ -30,7 +30,7 @@ ggsurvplot(
 )
 dev.off()
 
-# plot significant mutations between subtypes
+# plot significant mutations between subtypes, Fig. 3c
 rm(list=ls())
 library(ggplot2)
 library(ggrepel)
@@ -68,4 +68,18 @@ ggplot(enrich,aes(x=logor,y=lgp,label=gene)) +
                    segment.color = "grey50") +
   theme(panel.background=element_rect(colour="black",fill="white"))
 dev.off()
+
+# plot individual genes that have significant mutations between subtypes
+setwd('/home/shengli/projects/AEG_proteomics/results/WES')
+num_g1 <- 40
+num_g2 <- 23
+num_g3 <- 40
+muts_gp <- read.table('AEG_groups_mutation.txt',header=T,sep='\t',row.names=1)
+gene <- 'WIZ'
+mut_freq <- muts_gp[gene,]
+mut_rate <- c(0/40,0/23,5/40)
+pdf('/home/shengli/projects/AEG_proteomics/figures/WES/WIZ_subtype_mutation_freq.pdf',height=5,width=3)
+barplot(mut_rate,las=2,ylim=c(0,0.15))
+dev.off()
+
 
