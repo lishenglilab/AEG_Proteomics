@@ -28,7 +28,6 @@ ggplot(diff,aes(x=logFC,y=lgfdr,label=prot)) +
   theme(panel.background=element_rect(colour="black",fill="white"))
 dev.off()
 
-
 ### Functional enrichment results of up-regulated and down-regulated proteins, respectively. Fig. 2b
 ## enrichment analysis for up-regulated proteins
 rm(list = ls())
