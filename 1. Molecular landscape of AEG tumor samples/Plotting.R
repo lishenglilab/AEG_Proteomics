@@ -261,6 +261,21 @@ ggplot(tmb_stg_df,aes(x=Group,y=TMB)) +
         strip.background = element_blank(),
         strip.text.x = element_text(color="black",size=7,vjust=0))
 dev.off()
+
+### Distribution of relative abundance of detected proteins, Supplementary Fig. 3a
+rm(list=ls())
+library(ggplot2)
+setwd('/home/shengli/projects/AEG_proteomics/data/proteome')
+prot_ibaq <- read.table('Proteomics_iBAQ103_log2quantile_normlization_df.txt',header=T)
+sample_cancer <- as.character(unique(prot_ibaq[which(prot_ibaq[,'Group']=='Cancer'),'Sample']))
+sample_normal <- as.character(unique(prot_ibaq[which(prot_ibaq[,'Group']=='Normal'),'Sample']))
+samples <- c(sample_cancer,sample_normal)
+
+pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics_iBAQ_norm_distribution.pdf',width=20,height=5)
+ggplot(prot_ibaq,aes(x=Sample,y=Abundance,fill=Group)) +
+  geom_boxplot()
+dev.off()
+
 ### Boxplot showing the comparison of the numbers of expressed genes between parired AEG tumor and NAT samples, Supplementary Fig. 4c
 library(ggplot2) # version 3.3.5
 nums <- c(as.numeric(num_tumor_ordered[,'Gene_number']),as.numeric(num_normal_ordered[,'Gene_number']))
