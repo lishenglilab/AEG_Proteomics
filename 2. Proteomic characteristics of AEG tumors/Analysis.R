@@ -64,4 +64,47 @@ out <- data.frame(enrich$ID,enrich$Description,enrich$GeneRatio,enrich$BgRatio,r
 colnames(out) <- c("ID","Description","GeneRatio","BgRatio","enrich_factor","pvalue", "p.adjust","qvalue","geneID")
 setwd("/home/shengli/projects/AEG_proteomics/results/proteome")
 write.table(out, "KEGG_Prot_diff_down.txt", row.names = F, sep="\t", quote = F)        
+## calculate hallmark scores at protein-level
+rm(list=ls())
+library(GSVA)
+dir_res <- '/home/shengli/projects/AEG_proteomics/results/proteome'
+hallmarks <- read.table('/home/public/public_data/MSigDB/processed/h.all.v6.2.symbols.txt',header=T,sep='\t',row.names=1)
+dir_prot <- '/home/shengli/projects/AEG_proteomics/results/proteome'
+file_aeg <- paste(dir_res,'/','Proteomics_iBAQ103_log2quantile_normlization_impute_perc25_gene.txt',sep='')
+expr_aeg <- read.table(file_aeg,header=T,row.names=1,sep='\t')
+rownames(expr_aeg) <- toupper(rownames(expr_aeg))
+expr_aeg <- as.matrix(expr_aeg)
+expr_aeg <- log2(1+expr_aeg)
+es_aeg <- matrix(ncol=ncol(expr_aeg),nrow=nrow(hallmarks))
+for (n in 1:nrow(hallmarks)) {
+  hallmark_genes <- unlist(strsplit(as.character(hallmarks[n,1]),'[|]'))
+  gene_list <- list(hallmark=hallmark_genes)
+  es_hk <- gsva(expr_aeg,gene_list,mx.diff=FALSE,method='ssgsea',verbose=FALSE,parallel.sz=1)
+  es_aeg[n,] <- es_hk
+}
+rownames(es_aeg) <- rownames(hallmarks)
+colnames(es_aeg) <- colnames(expr_aeg)
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+write.table(es_aeg,file='AEG_protein_hallmark_scores.txt',quote=F,sep='\t')
+
+# difference of hallmark scores between tumor and normal samples
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+hk_scores <- read.table('AEG_protein_hallmark_scores.txt',header=T,row.names=1,sep='\t')
+results_pvalues <- c()
+results_foldchanges <- c()
+for (n in 1:nrow(hk_scores)) {
+  hk_tumor <- as.numeric(hk_scores[n,1:103])
+  hk_normal <- as.numeric(hk_scores[n,104:206])
+  mid_tumor <- median(hk_tumor)
+  mid_normal <- median(hk_normal)
+  fc <- round(mid_tumor/mid_normal,3)
+  results_foldchanges <- c(results_foldchanges,fc)
+  dif <- wilcox.test(hk_tumor,hk_normal)
+  results_pvalues <- c(results_pvalues,dif$p.value)
+}
+results_fdr <- p.adjust(results_pvalues,method='fdr')
+results <- cbind(results_foldchanges,results_pvalues,results_fdr)
+rownames(results) <- rownames(hk_scores)
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+write.table(results,file='AEG_hallmark_diff.txt',sep='\t',quote=F,col.names=F)
 
