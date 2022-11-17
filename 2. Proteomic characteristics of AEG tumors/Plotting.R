@@ -1,6 +1,6 @@
 ### Volcano plot showing the difference in proteins between AEG tumor and paired NAT samples. Fig. 2a
 
-## valcono plot of differentially expressed proteins
+## valcono plot of differentially expressed proteins, Fig. 2a
 rm(list=ls())
 library(ggplot2)
 library(ggrepel)
@@ -29,28 +29,6 @@ ggplot(diff,aes(x=logFC,y=lgfdr,label=prot)) +
 dev.off()
 
 ### Functional enrichment results of up-regulated and down-regulated proteins, respectively. Fig. 2b
-## enrichment analysis for up-regulated proteins
-rm(list = ls())
-options(stringsAsFactors = FALSE) # prohibit shift form character to factor
-library(tidyverse)
-library(Seurat)
-library(clusterProfiler)
-library(org.Hs.eg.db)
-
-setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
-dep_df <- read.table('Normal_Tumor_DEP_sig_genes.txt',header=T,row.names=1,sep='\t')
-up_df <- dep_df[which(dep_df[,'logFC']>0),]
-degID <- bitr(up_df$Gene, fromType = "SYMBOL", toType = c( "ENTREZID" ), OrgDb = org.Hs.eg.db ) # shift gene symbol to entrez id
-enrich <- enrichKEGG(gene =degID$ENTREZID ,
-                     organism = 'hsa', 
-                     pvalueCutoff=1, qvalueCutoff=1) # use OrgDb fitted for different species
-GeneRatio <- as.numeric(lapply(strsplit(enrich$GeneRatio,split="/"),function(x) as.numeric(x[1])/as.numeric(x[2])))
-BgRatio <- as.numeric(lapply(strsplit(enrich$BgRatio,split="/"),function(x) as.numeric(x[1])/as.numeric(x[2])  ))
-enrich_factor <- GeneRatio/BgRatio
-out <- data.frame(enrich$ID,enrich$Description,enrich$GeneRatio,enrich$BgRatio,round(enrich_factor,2),enrich$pvalue, enrich$p.adjust,enrich$qvalue,enrich$geneID)
-colnames(out) <- c("ID","Description","GeneRatio","BgRatio","enrich_factor","pvalue", "p.adjust","qvalue","geneID")
-setwd("/home/shengli/projects/AEG_proteomics/results/proteome")
-write.table(out, "KEGG_Prot_diff_up.txt", row.names = F, sep="\t", quote = F)
 ## barplot 
 setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
 res_enrich <- read.table('KEGG_Prot_diff_up.txt',header=T,sep='\t')
