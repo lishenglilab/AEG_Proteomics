@@ -172,7 +172,7 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/clinical_multicox.
 ggforest(model_cox)
 dev.off()
 
-### heatmap for signature proteins
+### heatmap for signature proteins, Fig. 3g
 setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
 sig_prf <- read.table('Proteomics_signature_proteins.txt',header=T,row.names=1,sep='\t')
 res <- read.table('signature_proteins_cox.txt',header=T,row.names=1,sep='\t')
@@ -190,3 +190,10 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/sigp_multicox.pdf',height=3.5
 ggforest(model_cox)
 dev.off()
 
+## waterfall plot in each subtype, Supplementary Fig. 8
+library(maftools)
+setwd('/home/shengli/projects/AEG_proteomics/results/WES')
+aeg_s3 <- read.maf(maf='AEG_mutation_neat_filter_non151058_group3.maf')
+pdf('/home/shengli/projects/AEG_proteomics/figures/WES/mutation_waterfall_S3_top30.pdf',height=6,width=10)
+oncoplot(maf=aeg_s3,draw_titv=T,top=30)
+dev.off()
