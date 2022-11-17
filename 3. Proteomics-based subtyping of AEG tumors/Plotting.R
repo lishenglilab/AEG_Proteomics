@@ -164,5 +164,12 @@ ggplot(scores,aes(x=Group,y=Score)) +
         strip.text.x = element_text(color="black",size=7,vjust=0))
 dev.off()
 
+## plot multi-variate Cox regression analysis of clinical features, Supplementary Fig. 7
+setwd('/home/shengli/projects/AEG_proteomcs/data/clinical')
+data_clinical <- read.table('survival_data_v4.txt',header=T,sep='\t')
+model_cox <- coxph(Surv(Time,Status) ~ Group + Age + Sex + Smoking + Alcohol + Siewert_type + Clinical_stage, data = data_clinical)
+pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/clinical_multicox.pdf',height=3.5,width=6.5)
+ggforest(model_cox)
+dev.off()
 
 
