@@ -1,4 +1,4 @@
-## calculate the difference
+## calculate the difference of proteins
 library(limma) # version 3.46.0
 setwd('/home/shengli/projects/AEG_proteomics/data/proteome')
 prot_mx <- read.table('Proteomics_iBAQ103_log2quantile_normlization_impute_perc25.txt',header=T,row.names=1,sep='\t')
