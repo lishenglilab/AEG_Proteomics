@@ -1,4 +1,14 @@
-## calculate the difference of proteins
+### normalize the protein abundance iBAQ
+library(limma)
+setwd('/home/shengli/projects/AEG_proteomics/data/proteome')
+prot_ibaq <- read.table('Proteomics_iBAQ103.txt',header=T,row.names=1)
+prot_ibaq <- as.matrix(prot_ibaq)
+quant_norm_ibaq <- normalizeQuantiles(prot_ibaq)
+write.table(quant_norm_ibaq,file='Proteomics_iBAQ103_quantile_normlization.txt',quote=F,sep='\t')
+log2_norm_ibaq <- log2(quant_norm_ibaq)
+write.table(log2_norm_ibaq,file='Proteomics_iBAQ103_log2quantile_normlization.txt',quote=F,sep='\t')
+
+### calculate the difference of proteins
 library(limma) # version 3.46.0
 setwd('/home/shengli/projects/AEG_proteomics/data/proteome')
 prot_mx <- read.table('Proteomics_iBAQ103_log2quantile_normlization_impute_perc25.txt',header=T,row.names=1,sep='\t')
