@@ -123,4 +123,20 @@ ggsurvplot(
   risk.table.y.text = FALSE # show bars instead of names in text annotations
 )
 dev.off()
+# heatmap for differential druggable genes, Fig. 2f
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+dep_drg <- read.table('DEP_sig_druggable_genes.txt',header=T)
+dep_drg2 <- dep_drg[which(abs(dep_drg[,'logFC']) > 1),]
+prots <- c(rownames(dep_sig_mx)[1:49],'P35869')
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+prot_mx <- read.table('Proteomics_iBAQ103_log2quantile_normlization_impute_perc25.txt',header=T,row.names=1,sep='\t')
+
+dep_sig_mx <- prot_mx[prots,]
+
+dep_sig_mx <- as.matrix(dep_sig_mx)
+
+pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/DEP_druggable_heatmap_v2.pdf',width=5,height=8)
+pheatmap(dep_sig_mx,scale='row',show_rownames=T,show_colnames=F,cluster_col=F,cluster_row=T,fontsize_col=5,fontsize_row=6,border_color=NA,color=colorRampPalette(c('blue','white','red'))(100))
+dev.off()
+
 
