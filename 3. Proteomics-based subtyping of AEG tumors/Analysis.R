@@ -177,3 +177,26 @@ results <- cbind(as.character(rownames(muts_gp)),results_g1_ors,results_g1_pvalu
 colnames(results) <- c('Gene','Group1_OR','Group1_Pvalue','Group2_OR','Group2_Pvalue','Group3_OR','Group3_Pvalue')
 setwd('/home/shengli/projects/AEG_proteomics/results/WES')
 write.table(results,file='subgroups_mut_fishertest.txt',sep='\t',quote=F,row.names=F,append=F)
+
+### transcriptional activities of hallmark comparisons between subtypes
+rm(list=ls())
+library(GSVA)
+hallmarks <- read.table('/home/public/public_data/MSigDB/processed/h.all.v6.2.symbols.txt',header=T,sep='\t',row.names=1)
+dir_expr <- '/home/shengli/projects/AEG_proteomics/results/RNAseq'
+file_aeg <- paste(dir_expr,'/','AEG_gene_tmp_mx_ordered.txt',sep='')
+expr_aeg <- read.table(file_aeg,header=T,row.names=1,sep='\t')
+rownames(expr_aeg) <- toupper(rownames(expr_aeg))
+expr_aeg <- as.matrix(expr_aeg)
+expr_aeg <- log2(1+expr_aeg)
+es_aeg <- matrix(ncol=ncol(expr_aeg),nrow=nrow(hallmarks))
+for (n in 1:nrow(hallmarks)) {
+  hallmark_genes <- unlist(strsplit(as.character(hallmarks[n,1]),'[|]'))
+  gene_list <- list(hallmark=hallmark_genes)
+  es_hk <- gsva(expr_aeg,gene_list,mx.diff=FALSE,method='ssgsea',verbose=FALSE,parallel.sz=1)
+  es_aeg[n,] <- es_hk
+}
+rownames(es_aeg) <- rownames(hallmarks)
+colnames(es_aeg) <- colnames(expr_aeg)
+setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq')
+write.table(es_aeg,file='AEG_hallmark_scores.txt',quote=F,sep='\t')
+
