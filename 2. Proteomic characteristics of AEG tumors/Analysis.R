@@ -8,7 +8,7 @@ write.table(quant_norm_ibaq,file='Proteomics_iBAQ103_quantile_normlization.txt',
 log2_norm_ibaq <- log2(quant_norm_ibaq)
 write.table(log2_norm_ibaq,file='Proteomics_iBAQ103_log2quantile_normlization.txt',quote=F,sep='\t')
 
-### calculate the difference of proteins
+### differentially expressed proteins analysis
 library(limma) # version 3.46.0
 setwd('/home/shengli/projects/AEG_proteomics/data/proteome')
 prot_mx <- read.table('Proteomics_iBAQ103_log2quantile_normlization_impute_perc25.txt',header=T,row.names=1,sep='\t')
@@ -19,4 +19,6 @@ fit <- eBayes(fit,trend=TRUE)
 dep_nt <- topTable(fit,coef=2,number=Inf)
 setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
 write.table(dep_nt,file="Normal_Tumor_DEP_all.txt",quote=F,sep='\t',append=F)
+
+###
 
