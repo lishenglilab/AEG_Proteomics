@@ -1,3 +1,28 @@
+# heatmap for subtypes DEPs, Fig. 3a
+rm(list=ls())
+library(pheatmap)
+setwd('/home/shengli/projects/AEG_proteomics/results')
+prn_profile <- read.table('Proteomics_perc25_impute_cvs25_v2.txt',header=T,row.names=1,sep='\t')
+setwd('/home/shengli/projects/AEG_proteomics/data/clinical')
+subtypes <- read.table('survival_data_v3.txt',header=T,row.names=1,sep='\t')
+samples_c1 <- as.character(rownames(subtypes[which(subtypes[,'Group'] == 'Group1'),]))
+samples_c2 <- as.character(rownames(subtypes[which(subtypes[,'Group'] == 'Group2'),]))
+samples_c3 <- as.character(rownames(subtypes[which(subtypes[,'Group'] == 'Group3'),]))
+samples_c1c2c3 <- c(samples_c1,samples_c2,samples_c3)
+setwd('/home/shengli/projects/AEG_proteomics/results')
+dep_c1c2 <- read.table('G1_G2_DEP_all.txt',header=T,row.names=1,sep='\t')
+sigp_c1c2 <- as.character(rownames(dep_c1c2[which(abs(dep_c1c2[,'logFC'])>1 & dep_c1c2[,'adj.P.Val'] < 0.05),]))
+dep_c2c3 <- read.table('G2_G3_DEP_all.txt',header=T,row.names=1,sep='\t')
+sigp_c2c3 <- as.character(rownames(dep_c2c3[which(abs(dep_c2c3[,'logFC'])>1 & dep_c2c3[,'adj.P.Val'] < 0.05),]))
+dep_c1c3 <- read.table('G1_G3_DEP_all.txt',header=T,row.names=1,sep='\t')
+sigp_c1c3 <- as.character(rownames(dep_c1c3[which(abs(dep_c1c3[,'logFC'])>1 & dep_c1c3[,'adj.P.Val'] < 0.05),]))
+sigps <- c(sigp_c1c2,sigp_c2c3,sigp_c1c3)
+sigps <- unique(sigps)
+prn_order <- prn_profile[sigps,samples_c1c2c3]
+pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics_subtypes_heatmap.pdf',height=5.5, width=6.5)
+pheatmap(prn_order,scale='row',show_rownames=F,show_colnames=T,cluster_col=F,cluster_row=T,color=colorRampPalette(c('blue','white','red'))(100))
+dev.off()
+
 ## plot individual survival curves of proteins, Supplementary Fig. 10
 library(survival)
 library(ggplot2)
