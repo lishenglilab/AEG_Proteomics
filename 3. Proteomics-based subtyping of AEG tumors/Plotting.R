@@ -82,4 +82,34 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/WES/WIZ_subtype_mutation_freq
 barplot(mut_rate,las=2,ylim=c(0,0.15))
 dev.off()
 
+#plot all difference of gene-level hallmarks
+setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq')
+hk_dif <- read.table('AEG_hallmarks_diff.txt',header=T,sep='\t')
+hallmarks <- c('Apical junction','Apical surface','Peroxisome',
+               'Adipogenesis','Angiogenesis','EMT','Myogenesis','Spermatogenesis','Pancreas beta cells',
+               'DNA repair','UV response UP','UV response DN',
+               'Allograft rejection','Coagulation','Complement','Interferon alpha response','Interferon gamma response','IL6 JAK STAT3 signaling','Inflammatory response',
+               'Bile acid metabolism','Cholesterol homeostasis','Fatty acid metabolism','Glycolysis','HEME metabolism','Oxidative phosphorylation','Xenobiotic metabolism',
+               'Apoptosis','Hypoxia','Protein secretion','Unfolded protein response','Reactive oxigen species pathway',
+               'E2F targets','G2M checkpoint','MYC targets v1','MYC targets v2','P53 pathway','Mitotic spindle',
+               'Androgen response','Estrogen response early','Estrogen response late','IL2 STAT5 signaling','KRAS signaling UP','KRAS signaling DN','mTORC1 signaling','Notch signaling',
+               'PI3K AKT mTOR signaling','Hedgehog signaling','TGF beta signaling','TNFA signaling via NFKB','WNT beta catenin signaling')
+hk_dif$lgfdr <- -log10(hk_dif[,'FDR'])
+hk_dif$logfc <- log2(hk_dif[,'FoldChange'])
+pdf('/home/shengli/projects/AEG_proteomics/figures/AEG_hk_scores_diff.pdf',width=9.5,height=3.5)
+ggplot(hk_dif,aes(x=Hallmark,y=Subtype))+
+  geom_point(aes(size=lgfdr,col=logfc))+
+  scale_color_gradient2(low="blue",mid="white",high="red",midpoint=0,na.value="white",name="FoldChange")+
+  scale_size_continuous(limit=c(0,15),range=c(0.5,4),breaks=c(-log10(0.05),5,10,15),labels=c("0.05","1e-5","1e-10","<1e-15"))+
+  scale_y_discrete(limit=c('S1','S2','S3'),expand=c(0.05,0.05))+
+  scale_x_discrete(limit=hallmarks,expand=c(0.05,0.05)) +
+  theme(panel.background=element_rect(colour="black",fill="white"),
+        axis.title=element_blank(),
+        axis.text.y=element_text(size=11,colour="black"),
+        axis.text.x=element_text(size=10,colour="black",angle=90,hjust=1,vjust=0.5),
+        axis.ticks=element_line(color="black"),
+        legend.text=element_text(size=10),
+        legend.title=element_text(size=12),
+        legend.key=element_rect(fill="white",colour="black"))
+dev.off()
 
