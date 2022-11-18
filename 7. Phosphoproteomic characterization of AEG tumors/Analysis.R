@@ -66,3 +66,11 @@ colnames(out) <- c("ID","Description","GeneRatio","BgRatio","enrich_factor","pva
 setwd("/home/shengli/projects/AEG_proteomics/results/phosphoproteome")
 write.table(out, "KEGG_Phosp_S1_diff.txt", row.names = F, sep="\t", quote = F)
 
+## KSEA analysis
+library(KSEAapp)
+setwd('/home/shengli/projects/AEG_proteomics/results/phosphoproteome')
+px <- read.table('Phosp_S3_diff_sig_gene_KSEA.csv',header=T,sep=',')
+KSEA.Complete(KSData,PX=px,NetworKIN = T,NetworKIN.cutoff = 1,m.cutoff=5,p.cutoff = 0.05)
+
+                             
+
