@@ -128,4 +128,59 @@ ggplot(g_expr_df,aes(x=Group,y=Expression)) +
         strip.text.x = element_text(color="black",size=7,vjust=0))
 dev.off()
 
+# plot the correlation between FBXO44 and immune cells, Supplementary Fig. 15a
+setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq/Immune')
+cor_cell <- read.table('FBXO44_immunecell_cor.txt',header=T,row.names=1,sep='\t')
+
+cor_cell$lgfdr <- -log10(cor_cell[,'FDR'])
+cor_cell$lgp <- -log10(cor_cell[,'Pvalue'])
+cor_cell$Cell <- rownames(cor_cell)
+cor_cell$FBXO44 <- rep(1,nrow(cor_cell))
+cells_ord <- c('Plasma cells','CD4+ Tcm','Th2 cells','CD4+ Tem','Monocytes','Macrophages M1','Mast cells','Macrophages','naive B-cells',
+               'Tgd cells','DC','Macrophages M2','aDC','iDC','pDC','Basophils','CD4+ memory T-cells','cDC','Tregs')
+
+pdf('/home/shengli/projects/AEG_proteomics/figures/RNAseq/FBXO44_immcell_cor.pdf',height=3, width=8)
+ggplot(cor_cell,aes(x=Cell,y=FBXO44))+
+  geom_point(aes(size=lgp,col=Correlation))+
+  scale_color_gradient2(low="blue",mid="white",high="red",midpoint=0,na.value="white",name="Correlation")+
+  scale_size_continuous(limit=c(0,5),range=c(0.5,4),breaks=c(-log10(0.05),5),labels=c("0.05","1e-5"))+
+  scale_x_discrete(limit=cells_ord,expand=c(0.05,0.05)) +
+  theme(panel.background=element_rect(colour="black",fill="white"),
+        axis.title=element_blank(),
+        axis.text.y=element_text(size=11,colour="black"),
+        axis.text.x=element_text(size=10,colour="black",angle=90,hjust=1,vjust=0.5),
+        axis.ticks=element_line(color="black"),
+        legend.text=element_text(size=10),
+        legend.title=element_text(size=12),
+        legend.key=element_rect(fill="white",colour="black"))
+dev.off()
+
+# box plots of individual immune cells, , Supplementary Fig. 15b
+mid_fbxo44 <- median(fbxo44_expr)
+samples_les <- colnames(gene_expr)[which(fbxo44_expr < mid_fbxo44)]
+samples_grt <- colnames(gene_expr)[which(fbxo44_expr >= mid_fbxo44)]
+cel_abd <- as.numeric(cell_abd['Plasma cells',])
+cel_abd_df <- data.frame(Abundance = cel_abd)
+rownames(cel_abd_df) <- colnames(cell_abd)
+cel_abd_df$Group <- 'High'
+cel_abd_df[samples_les,'Group'] <- 'Low'
+wilcox.test(as.numeric(cel_abd_df[which(cel_abd_df[,'Group']=='High'),'Abundance']),as.numeric(cel_abd_df[which(cel_abd_df[,'Group']=='Low'),'Abundance']))
+
+
+pdf('/home/shengli/projects/AEG_proteomics/figures/RNAseq/FBXO_comp_Th2.cells.pdf',height=6,width=5)
+ggplot(cel_abd_df,aes(x=Group,y=Abundance)) +
+  geom_jitter(width=0.15,size=0.7) +
+  geom_boxplot(color="black",fill=NA,outlier.shape=NA,width=0.3) +
+  scale_x_discrete(limit=c('Low','High'),expand=c(0.1,0)) +
+  theme(axis.text=element_text(size=10,colour="black"),axis.title=element_blank(),
+        panel.background = element_rect(fill = NA,color="black"),
+        panel.grid = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x=element_text(size=7,colour="black",angle=90,vjust=0.5,hjust=1),
+        axis.text.y=element_text(size=7,colour="black"),
+        strip.text.y = element_text(angle = 0,hjust=0,color="black",size=8),
+        strip.background = element_blank(),
+        strip.text.x = element_text(color="black",size=7,vjust=0))
+dev.off()
+
 
