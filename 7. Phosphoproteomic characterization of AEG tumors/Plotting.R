@@ -134,4 +134,18 @@ upset(fromExpression(input),
       line.size = 1)
 dev.off()
 
+### plot heatmap for KSEA score, Fig. 7c
+library(pheatmap)
+setwd('/home/shengli/projects/AEG_proteomics/results/phosphoproteome')
+ksea_scores <- read.table('KSEA_kinase_score_mx.txt',header=T,row.names=1,sep='\t')
+bk <- c(seq(-6,-0.1,by=0.01),seq(0,6,by=0.01))
+pdf('/home/shengli/projects/AEG_proteomics/figures/Phosphoproteomics/KSEA_score_heatmap.pdf',width=5,height=10)
+pheatmap(ksea_scores,
+         color=c(colorRampPalette(colors=c("blue",'white'))(length(bk)/2),colorRampPalette(colors=c("white","red"))(length(bk)/2)),
+         scale='none',
+         legend_breaks = seq(-6,6,2),
+         breaks = bk,
+         cluster_cols = F)
+dev.off()
+
 
