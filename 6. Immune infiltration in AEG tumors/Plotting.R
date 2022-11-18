@@ -1,3 +1,65 @@
+### heatmap of immune cells in three AEG subtypes, Fig. 6a
+setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq/Immune')
+cell_abd <- read.table('AEG_xCell_subtypes_zscore.txt',header=T,sep='\t')
+
+cells_ord <- c('Adipocytes','Astrocytes','Fibroblasts','Preadipocytes','Pericytes','ly Endothelial cells','mv Endothelial cells',
+               'Smooth muscle','Endothelial cells','Myocytes','Basophils','DC','Macrophages','Macrophages M1',
+               'Macrophages M2','Mast cells','aDC','cDC','iDC','pDC','Monocytes','Platelets','CLP','CMP','GMP','HSC','MEP','Megakaryocytes',
+               'Epithelial cells','Mesangial cells','Neurons','Sebocytes',
+               'Tregs','Tgd cells','CD4+ Tcm','CD4+ Tem','CD4+ memory T-cells','Th1 cells','Th2 cells','naive B-cells','Plasma cells') # lymphoid cells(9), myeloid cells(11), stromal cells(10), stem cells(7), other cells(4), 
+samples_ord <- c(samples_t1,samples_t2,samples_t3)
+pdf('/home/shengli/projects/AEG_proteomics/figures/RNAseq/xCell_subtype_heatmap.pdf',height=8,width=8)
+ggplot(cell_abd,aes(x=Sample,y=Cell)) +
+  geom_tile(aes(fill=Abundance),col='lightgray') +
+  scale_fill_gradient2(low='blue',high='red')
+  scale_x_discrete(limit=samples_ord) +
+  scale_y_discrete(limit=cells_ord) +
+  theme(panel.background = element_rect(colour=NA,fill='white',size=2),
+        panel.grid = element_blank(),
+        panel.grid.major=element_blank(),
+        axis.title=element_blank(),
+        axis.text.x=element_text(size=10,colour='black',angle=90,hjust=1,vjust=0.5),
+        axis.text.y=element_text(size=10,colour='black'),
+        axis.ticks=element_blank())
+dev.off()
+
+# difference between subtypes
+sub_pvalues <- c()
+for (n in 1:nrow(cell_abd)) {
+  abd_s1 <- as.numeric(cell_abd[n,samples_t1])
+  abd_s2 <- as.numeric(cell_abd[n,samples_t2])
+  abd_s3 <- as.numeric(cell_abd[n,samples_t3])
+  abd_sub_df <- data.frame(Abundance = c(abd_s1, abd_s2, abd_s3),
+                           Group = c(rep(1,length(abd_s1)),rep(2,length(abd_s2)),rep(3,length(abd_s3))))
+  comp <- kruskal.test(Abundance~Group,data=abd_sub_df)
+  sub_pvalues <- c(sub_pvalues,comp$p.value)
+}
+res_sub <- cbind(rownames(cell_abd),sub_pvalues)
+
+# plot individual cells, Supplementary Fig. 14
+cell_abd_tumor <- cell_abd[,samples_c1c2c3]
+
+cel_abd <- as.numeric(cell_abd_tumor['mv Endothelial cells',c(samples_c1c2c3)])
+
+cel_abd_df <- data.frame(Abundance = cel_abd,
+                         Group = c(rep('S1',length(samples_t1)),rep('S2',length(samples_t2)),rep('S3',length(samples_t3))))
+
+pdf('/home/shengli/projects/AEG_proteomics/figures/RNAseq/xCell_sub_box_mv Endothelial cells.pdf',height = 6,width = 3)
+ggplot(cel_abd_df,aes(x=Group,y=Abundance)) +
+  geom_jitter(width=0.15,size=0.7) +
+  geom_boxplot(color="black",fill=NA,outlier.shape=NA,width=0.3) +
+  scale_x_discrete(limit=c('S1','S2','S3'),expand=c(0.1,0)) +
+  theme(axis.text=element_text(size=10,colour="black"),axis.title=element_blank(),
+        panel.background = element_rect(fill = NA,color="black"),
+        panel.grid = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x=element_text(size=7,colour="black",angle=90,vjust=0.5,hjust=1),
+        axis.text.y=element_text(size=7,colour="black"),
+        strip.text.y = element_text(angle = 0,hjust=0,color="black",size=8),
+        strip.background = element_blank(),
+        strip.text.x = element_text(color="black",size=7,vjust=0))
+dev.off()
+
 ### plot differences of immune cells, Fig. 6b
 library(ggplot2)
 setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq')
@@ -21,7 +83,7 @@ ggplot(immune_dif,aes(x=Immune_cell,y=Group))+
         legend.key=element_rect(fill="white",colour="black"))
 dev.off()
 
-# plot individual immune cells, Fig. 6c-d, Supplementary Fig. 14
+# plot individual immune cells, Fig. 6c-d
 library(ggplot2)
 setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq')
 immune_prof <- read.table('xCell_AEG_gene_tmp_mx_ordered_xCell_2052121421.txt',header=T,row.names=1,sep='\t')
