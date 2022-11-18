@@ -42,3 +42,27 @@ aeg3_sig <- extractSignatures(mat = aeg3_tnm, n = 3)
 pdf('/home/shengli/projects/AEG_proteomics/figures/WES/mutSig_SBS_g3.pdf',width=5,height = 6)
 plotSignatures(nmfRes = aeg3_sig,sig_db = 'SBS')
 dev.off()
+
+## somatic interactions analysis
+rm(list=ls())
+library(maftools)
+setwd('/home/shengli/projects/AEG_proteomics/results/WES')
+
+# S-I subtype
+aeg1_mut <- read.maf('AEG_mutation_neat_filter_non151058_group1.maf')
+pdf('/home/shengli/projects/AEG_proteomics/figures/WES/SomaticInteractions_g1.pdf',width=5, height=5)
+somaticInteractions(maf=aeg1_mut,top=25,pvalue=c(0.05,0.1))
+dev.off()
+
+# S-II subtype
+aeg2_mut <- read.maf('AEG_mutation_neat_filter_non151058_group2.maf')
+pdf('/home/shengli/projects/AEG_proteomics/figures/WES/SomaticInteractions_g2.pdf',width=5, height=5)
+somaticInteractions(maf=aeg2_mut,top=25,pvalue=c(0.05,0.1))
+dev.off()
+
+# S-III subtype
+aeg3_mut <- read.maf('AEG_mutation_neat_filter_non151058_group3.maf')
+pdf('/home/shengli/projects/AEG_proteomics/figures/WES/SomaticInteractions_g3.pdf',width=5, height=5)
+somaticInteractions(maf=aeg3_mut,top=25,pvalue=c(0.05,0.1))
+dev.off()
+
