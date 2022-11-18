@@ -44,3 +44,25 @@ deg_s1 <- topTable(fit,coef=2,number=Inf)
 setwd('/home/shengli/projects/AEG_proteomics/results/phosphoproteome')
 write.table(deg_s1,file='Phosp_S1_diff_all.txt',quote=F,sep='\t',append=F)
 
+# enrichment analysis of differential phosphorylation sites
+rm(list = ls())
+options(stringsAsFactors = FALSE) # prohibit shift form character to factor
+library(tidyverse)
+library(Seurat)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+
+setwd('/home/shengli/projects/AEG_proteomics/results/phosphoproteome')
+deg_df <- read.table('Phosp_S1_diff_sig_gene.txt',head=T,row.names=1,sep='\t')
+degID <- bitr(deg_df$Gene, fromType = "SYMBOL", toType = c( "ENTREZID" ), OrgDb = org.Hs.eg.db ) # shift gene symbol to entrez id
+enrich <- enrichKEGG(gene =degID$ENTREZID ,
+                     organism = 'hsa', 
+                     pvalueCutoff=1, qvalueCutoff=1) # use OrgDb fitted for different species
+GeneRatio <- as.numeric(lapply(strsplit(enrich$GeneRatio,split="/"),function(x) as.numeric(x[1])/as.numeric(x[2])))
+BgRatio <- as.numeric(lapply(strsplit(enrich$BgRatio,split="/"),function(x) as.numeric(x[1])/as.numeric(x[2])  ))
+enrich_factor <- GeneRatio/BgRatio
+out <- data.frame(enrich$ID,enrich$Description,enrich$GeneRatio,enrich$BgRatio,round(enrich_factor,2),enrich$pvalue, enrich$p.adjust,enrich$qvalue,enrich$geneID)
+colnames(out) <- c("ID","Description","GeneRatio","BgRatio","enrich_factor","pvalue", "p.adjust","qvalue","geneID")
+setwd("/home/shengli/projects/AEG_proteomics/results/phosphoproteome")
+write.table(out, "KEGG_Phosp_S1_diff.txt", row.names = F, sep="\t", quote = F)
+
