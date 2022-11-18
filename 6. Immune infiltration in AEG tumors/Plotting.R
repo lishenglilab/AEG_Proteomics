@@ -74,4 +74,28 @@ ggplot(cell_abund,aes(x=Group,y=Abundance)) +
         strip.background = element_blank(),
         strip.text.x = element_text(color="black",size=7,vjust=0))
 dev.off()
+# plot chekpoint difference, Fig. 6f
+library(ggplot2)
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+ckp_diff <- read.table('G1G2G3_NAT_DEP_checkpoint_df.txt',header=T,sep='\t')
+ckp_diff$lgp <- -log10(ckp_diff[,'FDR'])
+ckp_diff[which(ckp_diff[,'lgp'] > 15),'lgp'] <- 15
+ckp_diff[which(ckp_diff[,'logFC'] > 5),'logFC'] <- 5
+
+pdf('/home/shengli/projects/AEG_proteomics/figures/Proteomics/Checkpoint_DEP_diff.pdf',width=9.5,height=3.5)
+ggplot(ckp_diff,aes(x=Gene,y=Group))+
+  geom_point(aes(size=lgp,col=logFC))+
+  scale_color_gradient2(low="blue",high="red",na.value="white",name="Difference")+
+  scale_size_continuous(limit=c(0,15),range=c(0.5,4),breaks=c(-log10(0.05),5,10),labels=c("0.05","1e-5","1e-10"))+
+  scale_y_discrete(limit=c('G1','G2','G3'),expand=c(0.05,0.05))+
+  theme(panel.background=element_rect(colour="black",fill="white"),
+        axis.title=element_blank(),
+        axis.text.y=element_text(size=11,colour="black"),
+        axis.text.x=element_text(size=10,colour="black",angle=90,hjust=1,vjust=0.5),
+        axis.ticks=element_line(color="black"),
+        legend.text=element_text(size=10),
+        legend.title=element_text(size=12),
+        legend.key=element_rect(fill="white",colour="black"))
+dev.off()
+
 
