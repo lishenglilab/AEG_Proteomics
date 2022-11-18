@@ -21,7 +21,7 @@ ggplot(immune_dif,aes(x=Immune_cell,y=Group))+
         legend.key=element_rect(fill="white",colour="black"))
 dev.off()
 
-# plot individual immune cells, Fig. 6c-d
+# plot individual immune cells, Fig. 6c-d, Supplementary Fig. 14
 library(ggplot2)
 setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq')
 immune_prof <- read.table('Immune_CIBERSORT.txt',header=T,sep='\t')
