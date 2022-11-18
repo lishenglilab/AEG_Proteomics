@@ -1,3 +1,39 @@
+### differences between different subtypes
+setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq/Immune')
+cell_abd <- read.table('xCell_AEG_gene_tmp_mx_ordered_xCell_2052121421.txt',header=T,row.names=1,sep='\t')
+cells <- c('Astrocytes','Astrocytes','Fibroblasts','Preadipocytes','Pericytes','ly Endothelial cells','mv Endothelial cells',
+           'Smooth muscle','Endothelial cells','Myocytes','CD4+ Tcm','CD4+ Tem','CD4+ memory T-cells','Tregs',
+           'Tgd cells','Th1 cells','Th2 cells','naive B-cells','Plasma cells','Basophils','DC','Macrophages','Macrophages M1',
+           'Macrophages M2','Mast cells','aDC','cDC','iDC','pDC','Monocytes','Platelets','CLP','CMP','GMP','HSC','MEP','Megakaryocytes',
+           'Epithelial cells','Mesangial cells','Neurons','Sebocytes')
+cell_abd <- cell_abd[cells,]
+samples_t1 <- c('C551594','C559459','C560016','C563560','C564447','C569091','C579894','C584162','C586163','C583851','C590054','C595498',
+                'C596146','C1005614','C1006005','C1009828','C532443','C505919','C562401','C587488','C599521','C584104','C498355','C565023','C246567',
+                'C576092','C488963','C533179','C504861','C568971','C528365','C533153','C1007477','C572176','C594667','C522528','C561723','C584243')
+samples_t2 <- c('C217360','C266198','C227213','C502774','C538376','C242946','C242956','C505805','C197023',
+                'C225468','C265603','C503345','C502439','C540265','C234760','C219685')
+samples_t3 <- c('C266473','C335207','C378018','C325830','C196713','C341159','C151058','C203659','C203933','C269944',
+                'C210038','C260824','C218213','C196436','C241209','C215502','C248148','C322712','C248917','C600290',
+                'C1004644','C305692','C258083','C259302','C1003009','C288415','C260319','C199181','C256818','C260513','C260742')
+
+pvalues_t12 <- c()
+pvalues_t13 <- c()
+pvalues_t23 <- c()
+for (n in 1:nrow(cell_abd)) {
+  abd_t1 <- as.numeric(cell_abd[n,samples_t1])
+  abd_t2 <- as.numeric(cell_abd[n,samples_t2])
+  abd_t3 <- as.numeric(cell_abd[n,samples_t3])
+  comp_t12 <- wilcox.test(abd_t1,abd_t2)
+  comp_t13 <- wilcox.test(abd_t1,abd_t3)
+  comp_t23 <- wilcox.test(abd_t2,abd_t3)
+  pvalues_t12 <- c(pvalues_t12,comp_t12$p.value)
+  pvalues_t13 <- c(pvalues_t13,comp_t13$p.value)
+  pvalues_t23 <- c(pvalues_t23,comp_t23$p.value)
+}
+res <- cbind(cells,pvalues_t12,pvalues_t13,pvalues_t23)
+colnames(res) <- c("Cell","Pvalue_S1-2","Pvalue_S1-3","Pvalue_S2-3")
+write.table(res,file='Cells_subtype_diff.txt',quote=F,sep='\t',row.names=F)
+
 ### calculate difference of immune infiltration between paried tumor and normal samples
 
 setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq')
