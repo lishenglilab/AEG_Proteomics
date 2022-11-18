@@ -78,3 +78,14 @@ ggplot(diff,aes(x=logFC,y=lgfdr,label=phosp)) +
   theme(panel.background=element_rect(colour="black",fill="white"))
 dev.off()
 
+# barplot of functional enrichment analysis results, Fig. 7b
+setwd('/home/shengli/projects/AEG_proteomics/results/phosphoproteome')
+res_enrich <- read.table('GO_BP_Phosp_S3_diff.txt',header=T,sep='\t')
+enrich_4bar <- data.frame(bp=res_enrich[1:8,'Description'],
+                          fdr=res_enrich[1:8,'p.adjust'])
+enrich_4bar$lgp <- -log10(enrich_4bar$fdr)
+rownames(enrich_4bar) <- enrich_4bar[,'bp']
+pdf('/home/shengli/projects/AEG_proteomics/figures/Phosphoproteomics/S3_diff_phosp_BP.pdf',width=7,height = 5)
+barplot(enrich_4bar[,'lgp'],horiz=T,names.arg=rownames(enrich_4bar),las=2,xlim=c(0,16))
+dev.off()
+
