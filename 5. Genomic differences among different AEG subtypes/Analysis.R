@@ -66,3 +66,27 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/WES/SomaticInteractions_g3.pd
 somaticInteractions(maf=aeg3_mut,top=25,pvalue=c(0.05,0.1))
 dev.off()
 
+## Oncogenic pathway analysis
+rm(list=ls())
+library(maftools)
+library(R.utils)
+setwd('/home/shengli/projects/AEG_proteomics/results/WES')
+
+#group1
+aeg1_mut <- read.maf('AEG_mutation_neat_filter_non151058_group1.maf')
+OncogenicPathways(maf = aeg1_mut)
+pdf('/home/shengli/projects/AEG_proteomics/figures/WES/OncogenicPathway/NOTCH_pathway_g1.pdf',width=6,height = 5)
+PlotOncogenicPathways(maf = aeg1_mut, pathways = "NOTCH")
+dev.off()
+#group2
+aeg2_mut <- read.maf('AEG_mutation_neat_filter_non151058_group2.maf')
+OncogenicPathways(maf = aeg2_mut)
+pdf('/home/shengli/projects/AEG_proteomics/figures/WES/OncogenicPathway/RTK-RAS_pathway_g2.pdf',width=6,height = 5)
+PlotOncogenicPathways(maf = aeg2_mut, pathways = "RTK-RAS")
+dev.off()
+#group3
+aeg3_mut <- read.maf('AEG_mutation_neat_filter_non151058_group3.maf')
+OncogenicPathways(maf = aeg3_mut)
+pdf('/home/shengli/projects/AEG_proteomics/figures/WES/OncogenicPathway/RTK-RAS_pathway_g3.pdf',width=6,height = 5)
+PlotOncogenicPathways(maf = aeg3_mut, pathways = "RTK-RAS")
+dev.off()
