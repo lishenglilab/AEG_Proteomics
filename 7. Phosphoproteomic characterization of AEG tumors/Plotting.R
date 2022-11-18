@@ -50,4 +50,31 @@ ggplot(nums_df,aes(x=sample_group,y=Numbers)) +
         strip.background = element_blank(),
         strip.text.x = element_text(color="black",size=7,vjust=0))
 dev.off()
+## valcano plot of differential phosphorylation sites
+rm(list=ls())
+library(ggplot2)
+library(ggrepel)
+setwd('/home/shengli/projects/AEG_proteomics/results/phosphoproteome')
+diff <- read.table('Normal_Tumor_DEPhop_all.txt',header=T,sep='\t')
+diff$lgfdr <- -log10(diff[,'adj.P.Val'])
+diff$phosp <- row.names(diff)
+diff_none <- diff[which(diff[,'adj.P.Val'] >= 0.01 | abs(diff[,'logFC']) <= 1),]
+diff_up <- diff[which(diff[,'adj.P.Val'] < 0.01 & diff[,'logFC'] > 1),]
+diff_down <- diff[which(diff[,'adj.P.Val'] < 0.01 & diff[,'logFC'] < -1),]
+up_phosp <- as.character(row.names(diff_up))
+down_phosp <- as.character(row.names(diff_down))
+
+pdf('/home/shengli/projects/AEG_proteomics/figures/Phosphoproteomics/diff_phosp_volcano_R1.pdf',width=6.87,height=5.92)
+ggplot(diff,aes(x=logFC,y=lgfdr,label=phosp)) +
+  geom_point(data=diff_none,aes(x=logFC,y=lgfdr),color='lightgray') +
+  geom_point(data=diff_up,aes(x=logFC,y=lgfdr),color='red') +
+  geom_point(data=diff_down,aes(x=logFC,y=lgfdr),color='blue') +
+  geom_label_repel(data = subset(diff, lgfdr > 30 | abs(logFC) > 9),
+                   size = 3,
+                   box.padding = 0.5,
+                   point.padding = 0.5,
+                   segment.size = 0.2,
+                   segment.color = "grey50") +
+  theme(panel.background=element_rect(colour="black",fill="white"))
+dev.off()
 
