@@ -41,3 +41,38 @@ ggplot(expr,aes(x=Group,y=Expression)) +
         strip.background = element_blank(),
         strip.text.x = element_text(color="black",size=7,vjust=0))
 dev.off()
+
+### survival analysis of FBXO44, Fig. 4c
+library(survival)
+library(ggplot2)
+library(survminer)
+setwd('/home/shengli/projects/AEG_proteomics/results/proteome')
+data_sigp <- read.table('sigp_for_coxp_v2.txt',header=T,sep='\t')
+
+protein <- 'Q9H4M3'
+abundances <- as.numeric(data_sigp[,protein])
+median_abund <- median(abundances)
+data_sigp$Group <- rep('High',nrow(data_sigp))
+data_sigp[which(data_sigp[,protein] <= median_abund),'Group'] <- 'Low'
+fit <- survfit(Surv(Time,Status)~Group, data=data_sigp)
+cox_model <- coxph(Surv(Time,Status)~Group+Age+Sex+Smoking+Alcohol+Siewert_type+Clinical_stage, data=data_sigp)
+summary(cox_model)
+# summary(cox_model) HR=0.48 (95% CI, 0.26-0.88)
+pdf('/home/shengli/projects/AEG_proteomics/figures/Survival_curve_Q9H4M3.pdf',height=5,width=5)
+ggsurvplot(
+  fit,                     # survfit object with calculated statistics.
+  data = data_sigp,             # data used to fit survival curves.
+  risk.table = FALSE,       # show risk table.
+  pval = TRUE,             # show p-value of log-rank test.
+  conf.int = FALSE,         # show confidence intervals for 
+  xlim = c(0,60),         # present narrower X axis, but not affect
+  xlab = "Time in months",   # customize X axis label.
+  break.time.by = 10,     # break X axis in time intervals by 500.
+  ggtheme = theme_light(), # customize plot and risk table with a theme.
+  risk.table.y.text.col = T, # colour risk table text annotations.
+  risk.table.y.text = FALSE # show bars instead of names in text annotations
+)
+dev.off()
+
+###
+
