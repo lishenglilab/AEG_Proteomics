@@ -1,4 +1,4 @@
-### phosphorylation abundance distribution
+### phosphorylation abundance distribution, Supplementary Fig. 1b
 rm(list=ls())
 library(ggplot2)
 setwd('/home/shengli/projects/AEG_proteomics/data/phosphoproteome')
@@ -11,7 +11,7 @@ ggplot(prot_ibaq,aes(x=Sample,y=Abundance,fill=Group)) +
   geom_boxplot()
 dev.off()
 
-## phosphosrylation site numbers
+## phosphosrylation site numbers, Fig. 1d
 setwd('/home/shengli/projects/AEG_proteomics/results/phosphoproteome')
 phosp_num <- read.table('Phosphoproteomics_sample_numbers.txt',header=T,sep='\t')
 num_normal <- phosp_num[which(phosp_num[,'Type']=='normal'),]
@@ -50,7 +50,7 @@ ggplot(nums_df,aes(x=sample_group,y=Numbers)) +
         strip.background = element_blank(),
         strip.text.x = element_text(color="black",size=7,vjust=0))
 dev.off()
-## valcano plot of differential phosphorylation sites
+## valcano plot of differential phosphorylation sites, Fig. 7a
 rm(list=ls())
 library(ggplot2)
 library(ggrepel)
