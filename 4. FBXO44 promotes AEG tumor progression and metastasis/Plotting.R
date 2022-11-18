@@ -74,5 +74,58 @@ ggsurvplot(
 )
 dev.off()
 
-###
+### plot the correlations between FBXO44 and immune checkpoint genes, Supplementary Fig. 15c
+setwd('/home/shengli/projects/AEG_proteomics/results/RNAseq/Immune')
+cor_immck <- read.table('FBXO44_immunecheck_cor.txt',header=T,row.names=1,sep='\t')
+cor_immck$lgfdr <- -log10(cor_immck[,'FDR'])
+cor_immck$lgp <- -log10(cor_immck[,'Pvalue'])
+cor_immck$Gene <- rownames(cor_immck)
+cor_immck$FBXO44 <- rep(1,nrow(cor_immck))
+genes <- c('TNFRSF14','TNFRSF25','CD40','VTCN1','TNFSF4','CD28','CD200','CD40LG','TNFRSF9','TNFRSF18','TNFSF9','ICOS',
+           'CD200R1','TIGIT','HLA-DRB1','LGALS3','CD276','CD70','NECTIN2','LGALS2','TNFRSF12A','IDO1','LAG3','TNFSF14',
+           'TNFRSF4','BTLA','ADORA2A','HAVCR1','CEACAM1','CTLA4','PDCD1LG2','SLAMF1','TNFSF18','PDCD1','IL2RB','PVR',
+           'CD86','CD80','PLEC','VSIR','CD27','LAIR1','HAVCR2','CD274','ICOSLG')
+pdf('/home/shengli/projects/AEG_proteomics/figures/RNAseq/FBXO44_immck_cor_lgp.pdf',height=3, width=8)
+ggplot(cor_immck,aes(x=Gene,y=FBXO44))+
+  geom_point(aes(size=lgp,col=Correlation))+
+  scale_color_gradient2(low="blue",mid="white",high="red",midpoint=0,na.value="white",name="Correlation")+
+  scale_size_continuous(limit=c(0,5),range=c(0.5,4),breaks=c(-log10(0.05),5),labels=c("0.05","1e-5"))+
+  scale_x_discrete(limit=genes,expand=c(0.05,0.05)) +
+  theme(panel.background=element_rect(colour="black",fill="white"),
+        axis.title=element_blank(),
+        axis.text.y=element_text(size=11,colour="black"),
+        axis.text.x=element_text(size=10,colour="black",angle=90,hjust=1,vjust=0.5),
+        axis.ticks=element_line(color="black"),
+        legend.text=element_text(size=10),
+        legend.title=element_text(size=12),
+        legend.key=element_rect(fill="white",colour="black"))
+dev.off()
+## plot boxplots of individual immune checkpionts, Supplementary Fig. 15d
+mid_fbxo44 <- median(fbxo44_expr)
+samples_les <- colnames(gene_expr)[which(fbxo44_expr < mid_fbxo44)]
+samples_grt <- colnames(gene_expr)[which(fbxo44_expr >= mid_fbxo44)]
+g_expr <- as.numeric(gene_expr['TNFRSF25',])
+g_expr_df <- data.frame(Expression = g_expr)
+rownames(g_expr_df) <- colnames(gene_expr)
+g_expr_df$Group <- 'High'
+g_expr_df[samples_les,'Group'] <- 'Low'
+wilcox.test(as.numeric(g_expr_df[which(g_expr_df[,'Group']=='High'),'Expression']),as.numeric(g_expr_df[which(g_expr_df[,'Group']=='Low'),'Expression']))
+
+
+pdf('/home/shengli/projects/AEG_proteomics/figures/RNAseq/FBXO_comp_VTCN1.pdf',height=6,width=5)
+ggplot(g_expr_df,aes(x=Group,y=Expression)) +
+  geom_jitter(width=0.15,size=0.7) +
+  geom_boxplot(color="black",fill=NA,outlier.shape=NA,width=0.3) +
+  scale_x_discrete(limit=c('Low','High'),expand=c(0.1,0)) +
+  theme(axis.text=element_text(size=10,colour="black"),axis.title=element_blank(),
+        panel.background = element_rect(fill = NA,color="black"),
+        panel.grid = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x=element_text(size=7,colour="black",angle=90,vjust=0.5,hjust=1),
+        axis.text.y=element_text(size=7,colour="black"),
+        strip.text.y = element_text(angle = 0,hjust=0,color="black",size=8),
+        strip.background = element_blank(),
+        strip.text.x = element_text(color="black",size=7,vjust=0))
+dev.off()
+
 
