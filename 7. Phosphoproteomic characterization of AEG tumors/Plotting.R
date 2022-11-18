@@ -89,3 +89,49 @@ pdf('/home/shengli/projects/AEG_proteomics/figures/Phosphoproteomics/S3_diff_pho
 barplot(enrich_4bar[,'lgp'],horiz=T,names.arg=rownames(enrich_4bar),las=2,xlim=c(0,16))
 dev.off()
 
+## upset plot for overlaps of differential phosphosites, Supplementary Fig. 16b
+library(UpSetR)
+input <- c("all-Down&S1-Down&S2-Down&S3-Down" = 330,
+           "all-Up&S1-Up&S2-Up&S3-Up" = 209,
+           "all-Up&S1-Up&S2-None&S3-Up" = 845,
+           "all-Down&S1-Down&S2-None&S3-Down" = 443,
+           "all-Down&S1-None&S2-Down&S3-None" = 121,
+           "all-Up&S1-Up&S2-Up&S3-None" = 46,
+           "all-Up&S1-None&S2-Up&S3-Up" = 85,
+           "all-Down&S1-Down&S2-Down&S3-None" = 79,
+           "all-Down&S1-None&S2-Down&S3-Down" = 76,
+           "all-None&S1-None&S2-Down&S3-None" = 37,
+           "all-Up&S1-Up&S2-None&S3-None" = 726,
+           "all-Down&S1-Down&S2-None&S3-None" = 493,
+           "all-Down&S1-None&S2-None&S3-Down" = 526,
+           "all-None&S1-Down&S2-None&S3-Down" = 3,
+           "all-None&S1-Up&S2-None&S3-Up" = 3,
+           "all-Up&S1-None&S2-None&S3-Up" = 817,
+           "all-None&S1-Up&S2-None&S3-None" = 97,
+           "all-None&S1-Down&S2-None&S3-None" = 123,
+           "all-None&S1-Up&S2-Up&S3-None" = 4,
+           "all-None&S1-None&S2-None&S3-Up" = 149,
+           "all-Up&S1-None&S2-Up&S3-None" = 164,
+           "all-None&S1-None&S2-Up&S3-None" = 90,
+           "all-Down&S1-None&S2-None&S3-None" = 1078,
+           "all-Up&S1-None&S2-None&S3-None" = 2040,
+           "all-None&S1-None&S2-Down&S3-Down" = 2,
+           "all-None&S1-None&S2-None&S3-Down" = 199,
+           "all-None&S1-None&S2-Up&S3-Up" = 2,
+           "all-None&S1-None&S2-Up&S3-Down" = 1,
+           "all-None&S1-Down&S2-None&S3-Up" = 1
+           )
+pdf('/home/shengli/projects/AEG_proteomics/figures/Phosphoproteomics/Differential_phosp_overlaps.pdf',height=10,width=6)
+upset(fromExpression(input),
+      nintersects = NA, 
+      nsets = 12, 
+      order.by = "freq", 
+      decreasing = T, 
+      mb.ratio = c(0.6, 0.4),
+      number.angles = 0, 
+      text.scale = 1.1, 
+      point.size = 2.8, 
+      line.size = 1)
+dev.off()
+
+
